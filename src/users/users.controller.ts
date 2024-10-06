@@ -1,10 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Inject, ParseIntPipe } from '@nestjs/common';
+import { Controller, Post, Body, Patch, Param, Delete, Inject, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { USER_SERVICE } from 'src/config';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { catchError } from 'rxjs';
-import { LoginUserDto } from './dto';
+import { AuthGuard } from 'src/auth/guards';
 
 @Controller('users')
 export class UsersController {
@@ -12,6 +12,7 @@ export class UsersController {
     @Inject(USER_SERVICE) private readonly userService: ClientProxy,
   ) {}
 
+  @UseGuards(AuthGuard)
   @Post()
   createUser(@Body() createUserDto: CreateUserDto) {
     return this.userService.send('registerUser', createUserDto)
@@ -20,6 +21,7 @@ export class UsersController {
     );
   }
 
+  @UseGuards(AuthGuard)
   @Patch(':id')
   update(@Param('id', ParseIntPipe) id: number, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.send('updateUser', 
@@ -30,9 +32,10 @@ export class UsersController {
       );
   }
 
+  @UseGuards(AuthGuard)
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number) {
-    return this.userService.send('removeUser', {id})
+    return this.userService.send('removeUser', id)
     .pipe(
       catchError( err => {throw new RpcException(err)})
     );

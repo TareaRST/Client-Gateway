@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { UsersController } from './users.controller';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { envs, USER_SERVICE } from 'src/config';
+import { AUTH_SERVICE, envs, USER_SERVICE } from 'src/config';
 
 @Module({
   controllers: [UsersController],
@@ -14,6 +14,16 @@ import { envs, USER_SERVICE } from 'src/config';
         options: {
           host: envs.usersMicroserviceHost,
           port: envs.usersMicroservicePort,
+        },
+      },
+    ]),
+    ClientsModule.register([
+      {
+        name: AUTH_SERVICE,
+        transport: Transport.TCP,
+        options: {
+          host: envs.authMicroserviceHost,
+          port: envs.authMicroservicePort,
         },
       },
     ]),
