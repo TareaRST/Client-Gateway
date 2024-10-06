@@ -37,12 +37,4 @@ export class UsersController {
       catchError( err => {throw new RpcException(err)})
     );
   }
-
-  @Post('/login')
-  login(@Body() loginUserDto: LoginUserDto) {
-    return this.userService.send('loginUser', loginUserDto)
-    .pipe(
-      catchError(err => {throw new RpcException(err)})
-    );
-  }
 }
